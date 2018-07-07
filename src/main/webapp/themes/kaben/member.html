@@ -1,0 +1,186 @@
+<#include 'common/header.html' />
+<#include 'common/reception_header.html'/>
+<link rel="stylesheet" href="${ctx}${themes_path}/css/table_list.css" type="text/css" />
+<#-- 创建会员是否登录标签 -->
+<#assign memberLvLoginTag= newTag("memberLvLoginTag")>
+<#-- 获取是否登录  -->
+<#assign lvLogin = memberLvLoginTag() >
+<#if lvLogin?? && lvLogin == 6>
+
+<#-- 创建购物车标签 -->
+<#assign memberListTag= newTag("memberListTag")>
+<#--通过购物车标签获取购物项列表 -->
+<#assign itemList = memberListTag() >	
+
+
+<div style="width:1200px;height:1px;margin:0px auto;clear:both;"></div>
+<div class="goods_clear"></div>
+<!-- 新版检索html -->
+
+<div class="goods_list_all" >
+  		<!-- 排序 -->
+  		<div class="goods_bar">
+    		<div class="sorting_goods"> 
+    			<p>台位状态：</p>
+			   	<div class="bar_page">
+			   	</div>
+    		</div>
+  		</div>
+		 <!-- 商品列表循环  -->
+		 <#if itemList ?size gt 0>
+		 <div class="goodslist_circulate" >
+			<ul class="goodslist_all ">
+		    	<#list itemList as item >
+			        <li class="item">
+			      		<div class="goodslist">
+			        		<div class="goodslist_img">
+			        			<a href="${ctx}/cart.html?member_id=${item.member_id}&member_name=${item.name!''}" target="_blank" title="${item.name}">
+			        				<#if item.goods_price?? && item.goods_price gt 0>
+			        					<@image border="0" src="${ctx}/adminthemes/version3/images/youren.png" id="table-${item.member_id}"  alt="${item.name!''}" />
+			        				<#else>
+			        					<@image border="0" src="${ctx}/adminthemes/version3/images/wuren.png" id="table-${item.member_id}" alt="${item.name!''}" />
+			        				</#if>
+			        			</a> 
+			        		</div>
+				       	 	<div class="goodslist_intro">
+				       	 		<div class="goodslist_price" id="price-${item.member_id}">
+									<em class="sale_price"  title="${item.goods_price!''}"><#if item.goods_price?? && item.goods_price gt 0>￥${item.goods_price!''}<#else></#if></em>
+			     				</div>
+		         				<div class="goodslist_name">
+		         					<a href="${ctx}/cart.html?member_id=${item.member_id}&member_name=${item.name!''}"  title="${item.name!''}">${item.name!''}</a>
+		         				</div>
+			       			</div>
+			      		</div>
+			    	</li>
+		    	</#list>
+		  	</ul>
+		 </div>
+		 <div class="goods_list_page">
+  		</div>
+  		
+		<div id="extbkbox" class="extbkbox" style="display:block;">
+		
+			<div class="extbkboxm">
+				<strong style="float:left;padding-left:10px;">新增内容</strong> 
+				<div class="extmore">
+					<span class="extbkboxnar" id="extbkboxnar" onclick="extbkboxnar();"></span>
+				</div>
+			</div>
+		
+			<div class="extbkboxb" id="extbkboxb" style="display:block;">
+				<ul>
+<!-- 					<li><a href="#">时创新增内容时创新增内容容时创新增内容</a></li> -->
+<!-- 					<li><a href="#">时创新增内容时创新增内容容时创新增内容</a></li> -->
+<!-- 					<li><a href="#">时创新增内容时创新增内容容时创新增内容</a></li> -->
+<!-- 					<li><a href="#">时创新增内容时创新增内容容时创新增内容</a></li> -->
+<!-- 					<li><a href="#">时创新增内容时创新增内容容时创新增内容</a></li> -->
+<!-- 					<li><a href="#">时创新增内容时创新增内容容时创新增内容</a></li> -->
+				</ul>
+			</div>
+		
+		</div>
+  		<#else>
+  			<p class="no-goodslist">未找到相关数据</p>
+  		</#if>
+</div>
+<script>
+function extbkboxnar(){
+	var narrowmen = document.getElementById("extbkboxnar");
+	var narrowbox = document.getElementById("extbkboxb");
+	if (narrowbox.style.display == "block"){
+		narrowbox.style.display = "none";
+		narrowmen.className = "extbkboxnarove";
+	}else{
+		narrowbox.style.display = "block";
+		narrowmen.className = "extbkboxnar";
+	}		
+}
+function extboxdisplay(){
+	var narrowmen = document.getElementById("extbkboxnar");
+	var narrowbox = document.getElementById("extbkboxb");
+	if (narrowbox.style.display == "none"){
+		narrowbox.style.display = "block";
+		narrowmen.className = "extbkboxnar";
+	}
+}
+
+$(function(){
+    var audioElement = document.createElement('audio');
+    audioElement.setAttribute('src', '${ctx}${themes_path}/images/你有新的消息.mp3');
+//    audioElement.setAttribute('autoplay', 'autoplay'); //打开自动播放
+        // 指定websocket路径
+        var websocket;
+        if ('WebSocket' in window) {
+			websocket = new WebSocket("ws://localhost:8080/b2c/ws");
+		} else if ('MozWebSocket' in window) {
+			websocket = new MozWebSocket("ws://localhost:8080/b2c/ws");
+		} else {
+			websocket = new SockJS("http://localhost:8080/b2c/ws/sockjs");
+		}
+        //var websocket = new WebSocket('ws://localhost:8080/Spring-websocket/ws');
+        websocket.onmessage = function(event) {
+       	 var data=JSON.parse(event.data);
+       	 	if(data.from>0||data.from==-1){//用户或者群消息
+       	 		if(data.text=="userAdd"||data.text=="adminAdd"){
+       	 			var picSrc = $('#table-'+data.from).attr('src');
+       	 			var strs=picSrc.split("/");
+//       	 			alert(strs[strs.length-1]);
+       	 			if(strs[strs.length-1]=="wuren.png"){
+       	 				var newstr=picSrc.replace("wuren.png","youren.png");
+       	 				$('#table-'+data.from).attr('src',newstr)
+       	 			}
+       	 			$('#price-'+data.from).html('<em class="sale_price">加单了</em>');
+ 		            // 接收服务端的实时消息并添加到HTML页面中
+ 		            if(data.text=="userAdd"){
+			            $("#extbkboxb ul").append('<li><a href="${ctx}/cart.html?member_id='+data.from+'&member_name='+data.fromName+'" target="_blank">('+data.from+")"+data.fromName+"&nbsp;"+data.date+"&nbsp;下单</a></li>");
+			            extboxdisplay();
+				        // 滚动条滚动到最低部
+		//	            scrollToBottom();
+			            audioElement.play();
+		            }
+	            }
+       	 		if(data.text=="adminClose"){
+       	 			var picSrc = $('#table-'+data.from).attr('src');
+       	 			var strs=picSrc.split("/");
+//       	 			alert(strs[strs.length-1]);
+       	 			if(strs[strs.length-1]=="youren.png"){
+       	 				var newstr=picSrc.replace("youren.png","wuren.png");
+       	 				$('#table-'+data.from).attr('src',newstr)
+       	 			}
+       	 			$('#price-'+data.from).html('');
+			        $("#extbkboxb ul li").remove(":contains('("+data.from+")')");
+	            }
+	        }else if(data.from==0){//上线消息
+            	if(data.text!="")
+            	{	
+//           		$("#users").append('<a href="#" onclick="talk(this)" class="list-group-item">'+data.text+'</a>');
+//            		alert(data.text+"上线了");
+//    	            $("#extbkboxb ul").append("<li>"+data.text+"上线了"+"</li>");
+            	}
+            }else if(data.from==-2){//下线消息
+            	if(data.text!="")
+            	{	
+//            		$("#users > a").remove(":contains('"+data.text+"')");
+//            		alert(data.text+"下线了");
+            	}
+            }
+        };
+		$(".goodslist_all li").mouseover(function(){
+			$(".goodslist_all li").removeClass("item-hover");
+			$(this).addClass("item-hover");
+		})
+		$(".goodslist_all li").mouseleave(function(){
+			$(".goodslist_all li").removeClass("item-hover");
+		})
+	})
+</script>
+	<#include 'common/footer.html'/>
+<#else>
+	<script type="text/javascript">
+    if (${lvLogin}==0) {
+    	location.href = "login.html";
+    } else {
+    	location.href = "cart.html";
+    }
+	</script>
+</#if>

@@ -1,0 +1,16 @@
+<#-- 创建购物车标签 -->
+<#assign tableTag= newTag("tableTag")>
+<#--通过购物车标签获取购物项列表 -->
+<#assign itemList = tableTag("${member_id}") >	
+
+<#-- 创建订单价格标签 -->
+<#assign tablePriceTag= newTag("tableSelectPriceTag") >
+<#assign tablePrice = tablePriceTag("{'member_id':'${member_id}'}") >	
+<div class="yes_bonded">
+<span class="c08">
+	总价
+	<input type="hidden" value="${tablePrice.goodsPrice}" id="bonded_price">
+	<span class="color02">(不含税费)</span>：
+	<span class="color03">${tablePrice.goodsPrice?string("currency")}<#if tablePrice.exchange_point?? && tablePrice.exchange_point!=0>+${(tablePrice.exchange_point)!''}分</#if></span>
+</span>
+</div>

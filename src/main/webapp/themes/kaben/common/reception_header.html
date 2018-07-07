@@ -1,0 +1,121 @@
+<!--header-->
+<div class="header">
+	<div class="logo_area">
+		<div class="logo">
+			<a href="${ctx}/member.html">
+				<@image src="${site.logofile!''}" title="logo"/>
+			</a>
+		</div>
+		<div class="search_area">
+			<div class="search">
+				<div style="border:1px solid #dcdcdc;height:34px;overflow:hidden;float:left;width:300px;border-right:0px none;">
+					<input type="text" class="hunt" id="keyword" placeholder="<#if keyword??>${keyword!''}<#else>请输入产品关键字等...</#if>" />
+				</div>
+				<div  name="s_seek" class="s_seek" id="searchBtn" style="border:1px solid #33a600;height:34px;overflow:hidden;float:left;width:100px;">搜索</div>
+			</div>
+		</div>
+		<div class="service_tel">
+			<@image src="${ctx}${themes_path}/images/cn.png" alt="承诺图片"/>
+		</div>
+	</div>
+</div>
+<div style="width: 1200px;margin: 0 auto;border-top: 2px solid #48bb44;">
+</div>
+<!--header end-->
+
+<script type="text/javascript">
+$(function(){
+	// 添加IE7样式兼容 _by: Andste 2016-9-30 10:39:15
+	if(Sys.ie == 7){
+		$('.search .hunt').css({
+			width: 350,
+			paddingTop: 0,
+			paddingBottom: 0
+		})
+
+		$('.search .s_seek').css({
+			height: 36,
+			lineHeight: '36px'
+		})
+	}
+
+	/* var url_ = "${ctx}/api/shop/goods-words.do";
+	$("#keyword").bigAutocomplete({
+		url:url_, 
+		callback:function(data){
+	 	location.href="${ctx}/search.html?keyword="+data.title;
+
+	}}); */
+	
+	$("#keyword").keypress(function(event){
+		//	$("#keyword").attr("class","seek");
+			if(event.keyCode=="13" ){
+				search();
+			}
+		});
+		$("#keyword").click(function(){
+			if($(this).val() == searchTipText){
+				$(this).val("");
+			}
+		});
+		$("#keyword").blur(function(){
+			if($(this).val() == ''){
+				$(this).val(searchTipText);
+			}
+		});
+		
+		$("#searchBtn").click(function(){
+			search();
+		});
+})
+
+		
+	var searchTipText = "请输入产品关键字，如品牌、型号等";
+	function search(){
+		var keyword = $.trim( $("#keyword").val());
+		if(keyword == searchTipText){
+			keyword = '';
+		}
+		if(keyword.indexOf('\\')!=-1){
+			alert("请输入正确的关键词");
+			return false;
+		}
+		if(keyword==''){
+			alert("请输入关键字");
+		}else{
+			keyword = keyword.replace(/\//g,"-xie-")
+			location.href="${ctx}/goods_list.html?keyword="+keyword;
+		}
+	}
+	
+	
+
+</script>	
+<script type="text/javascript">
+	$(function(){
+
+
+
+		<#assign luceneCheckTag = newTag("luceneCheckTag") />
+		<#assign lucene =luceneCheckTag() />
+
+		<#if lucene=='ON' >
+		var url_ = "${ctx}/api/shop/goods-words/list-words.do";
+		 $("#keyword").bigAutocomplete({url:url_, callback:function(data){
+			 location.href="${ctx}/goods_list.html?keyword="+data.title;
+	    }});
+	    </#if>
+
+
+	    <#assign solrCheckTag = newTag("solrCheckTag")/>
+		<#assign solr=solrCheckTag()/>
+
+		<#if solr=='ON' >
+			 var url_ = "${ctx}/api/shop/goods-words.do";
+			 $("#keyword").bigAutocomplete({url:url_, callback:function(data){
+			 location.href="${ctx}/goods_list.html?keyword="+data.title;
+	    }});
+		</#if>
+	})
+</script>
+	
